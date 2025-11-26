@@ -1,0 +1,65 @@
+'Autor: Jesiel
+
+'|Como rodar o dashboard no próprio computador|
+'
+'Para visualizar e executar o dashboard no seu computador, siga estes passos:
+
+'Opção 1: Método Mais Rápido (Recomendado)
+'Usando o CodeSandbox ou StackBlitz (online, sem instalação):
+
+Acesse: https://codesandbox.io/s/ ou outro site semelhante
+Escolha "React" como template
+Cole o código do dashboard no arquivo App.js
+O preview aparecerá automaticamente
+
+'
+'Opção 2: Executar Localmente (Profissional)
+'Passo 1: Instalar Node.js
+'Baixe em: https://nodejs.org
+'Instale a versão LTS (recomendada)
+'Verifique no terminal: node --version
+
+'Passo 2: Criar o Projeto
+'Abra o terminal/prompt e execute:
+'bash# Criar novo projeto React
+'npx create-react-app dashboard-clinica
+
+# Entrar na pasta
+cd dashboard-clinica
+
+# Instalar bibliotecas necessárias
+npm install recharts lucide-react
+Passo 3: Adicionar o Código
+
+Abra a pasta dashboard-clinica no seu editor (VS Code, Sublime, etc)
+Abra o arquivo src/App.js
+Apague todo o conteúdo do arquivo
+Cole o código completo do dashboard
+Salve o arquivo (Ctrl+S)
+
+'Passo 4: Configurar Tailwind CSS
+'No terminal, execute:
+'bashnpm install -D tailwindcss
+'npx tailwindcss init
+'Edite o arquivo tailwind.config.js:
+
+javascriptmodule.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+Edite o arquivo src/index.css e adicione no início:
+css@tailwind base;
+@tailwind components;
+@tailwind utilities;
+Passo 5: Executar
+No terminal:
+bashnpm start
+
+O navegador abrirá automaticamente em http://localhost:3000
+
+'Opção 3: HTML Puro (Mais Simples, mas Limitado)
+'O arquivo html, já se encontra adaptado para uso.
