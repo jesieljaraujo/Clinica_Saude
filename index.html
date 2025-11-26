@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Clínica de Saúde</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    
+    <style>
+        /* Estilos personalizados */
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    
+    <div class="container mx-auto p-6 max-w-7xl">
+        
+        <!-- Cabeçalho -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                        <svg class="w-9 h-9 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        Dashboard - Clínica de Saúde
+                    </h1>
+                    <p class="text-gray-600 mt-2">Análise de consultas e desempenho da clínica</p>
+                </div>
+                
+                <!-- Botão de upload -->
+                <label class="cursor-pointer btn-primary text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all hover:shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <span>Carregar CSV</span>
+                    <input type="file" id="uploadCSV" accept=".csv" class="hidden">
+                </label>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Filtros</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Especialidade</label>
+                    <select id="filtroEspecialidade" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="Todas">Todas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+                    <select id="filtroPeriodo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="Todos">Todos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards de métricas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Total de Consultas -->
+            <div class="bg-white rounded-lg shadow-lg p-6 card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Total de Consultas</p>
+                        <p id="totalConsultas" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                    </div>
+                    <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Receita Total -->
+            <div class="bg-white rounded-lg shadow-lg p-6 card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Receita Total</p>
+                        <p id="receitaTotal" class="text-3xl font-bold text-green-600 mt-2">R$ 0,00</p>
+                    </div>
+                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Idade Média -->
+            <div class="bg-white rounded-lg shadow-lg p-6 card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Idade Média</p>
+                        <p id="idadeMedia" class="text-3xl font-bold text-gray-800 mt-2">0 anos</p>
+                    </div>
+                    <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Taxa de Conclusão -->
+            <div class="bg-white rounded-lg shadow-lg p-6 card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Taxa de Conclusão</p>
+                        <p id="taxaConclusao" class="text-3xl font-bold text-blue-600 mt-2">0%</p>
+                    </div>
+                    <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Gráfico de Receita Mensal -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Receita Mensal</h3>
+                <canvas id="graficoReceita" height="250"></canvas>
+            </div>
+
+            <!-- Gráfico de Consultas por Especialidade -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Consultas por Especialidade</h3>
+                <canvas id="graficoEspecialidades" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfico de Distribuição de Idade -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Distribuição de Idade dos Pacientes</h3>
+            <canvas id="graficoIdade" height="100"></canvas>
+        </div>
+
+        <!-- Instruções -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">📋 Como usar</h3>
+            <ul class="text-gray-600 space-y-2">
+                <li>• O dashboard mostra dados de exemplo automaticamente</li>
+                <li>• Clique em "Carregar CSV" para importar seus próprios dados</li>
+                <li>• Formato do CSV: data,paciente,idade,especialidade,valor,status</li>
+                <li>• Use os filtros para analisar especialidades e períodos específicos</li>
+                <li>• Os gráficos são interativos - passe o mouse para ver detalhes</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // ========================================
+        // DADOS DE EXEMPLO DA CLÍNICA
+        // ========================================
+        let dadosOriginais = [
+            { data: '2024-01', paciente: 'Maria Silva', idade: 45, especialidade: 'Cardiologia', valor: 350, status: 'Concluído' },
+            { data: '2024-01', paciente: 'João Santos', idade: 32, especialidade: 'Ortopedia', valor: 280, status: 'Concluído' },
+            { data: '2024-01', paciente: 'Ana Costa', idade: 28, especialidade: 'Dermatologia', valor: 200, status: 'Concluído' },
+            { data: '2024-02', paciente: 'Pedro Lima', idade: 55, especialidade: 'Cardiologia', valor: 350, status: 'Concluído' },
+            { data: '2024-02', paciente: 'Julia Mendes', idade: 41, especialidade: 'Ginecologia', valor: 300, status: 'Concluído' },
+            { data: '2024-02', paciente: 'Carlos Souza', idade: 38, especialidade: 'Ortopedia', valor: 280, status: 'Agendado' },
+            { data: '2024-03', paciente: 'Beatriz Alves', idade: 50, especialidade: 'Cardiologia', valor: 350, status: 'Concluído' },
+            { data: '2024-03', paciente: 'Ricardo Dias', idade: 29, especialidade: 'Dermatologia', valor: 200, status: 'Concluído' },
+            { data: '2024-03', paciente: 'Fernanda Rocha', idade: 35, especialidade: 'Ginecologia', valor: 300, status: 'Concluído' },
+            { data: '2024-03', paciente: 'Lucas Martins', idade: 44, especialidade: 'Ortopedia', valor: 280, status: 'Cancelado' },
+        ];
+
+        // Variáveis globais para os gráficos
+        let graficoReceita, graficoEspecialidades, graficoIdade;
+
+        // ========================================
+        // FUNÇÃO: PROCESSAR ARQUIVO CSV
+        // ========================================
+        document.getElementById('uploadCSV').addEventListener('change', function(e) {
+            const arquivo = e.target.files[0];
+            if (arquivo) {
+                const leitor = new FileReader();
+                leitor.onload = function(evento) {
+                    const texto = evento.target.result;
+                    const linhas = texto.split('\n');
+                    const dadosNovos = [];
+
+                    // Processar cada linha do CSV (pulando o cabeçalho)
+                    for (let i = 1; i < linhas.length; i++) {
+                        if (linhas[i].trim()) {
+                            const colunas = linhas[i].split(',');
+                            dadosNovos.push({
+                                data: colunas[0]?.trim(),
+                                paciente: colunas[1]?.trim(),
+                                idade: parseInt(colunas[2]) || 0,
+                                especialidade: colunas[3]?.trim(),
+                                valor: parseFloat(colunas[4]) || 0,
+                                status: colunas[5]?.trim()
+                            });
+                        }
+                    }
+
+                    if (dadosNovos.length > 0) {
+                        dadosOriginais = dadosNovos;
+                        atualizarDashboard();
+                        alert('Arquivo carregado com sucesso! ' + dadosNovos.length + ' registros importados.');
+                    }
+                };
+                leitor.readAsText(arquivo);
+            }
+        });
+
+        // ========================================
+        // FUNÇÃO: FILTRAR DADOS
+        // ========================================
+        function filtrarDados() {
+            const especialidadeSelecionada = document.getElementById('filtroEspecialidade').value;
+            const periodoSelecionado = document.getElementById('filtroPeriodo').value;
+
+            return dadosOriginais.filter(item => {
+                const filtroEsp = especialidadeSelecionada === 'Todas' || item.especialidade === especialidadeSelecionada;
+                const filtroPer = periodoSelecionado === 'Todos' || item.data === periodoSelecionado;
+                return filtroEsp && filtroPer;
+            });
+        }
+
+        // ========================================
+        // FUNÇÃO: CALCULAR MÉTRICAS
+        // ========================================
+        function calcularMetricas(dados) {
+            const totalConsultas = dados.length;
+            const receitaTotal = dados.reduce((soma, item) => soma + item.valor, 0);
+            const idadeMedia = dados.reduce((soma, item) => soma + item.idade, 0) / totalConsultas || 0;
+            const consultasConcluidas = dados.filter(item => item.status === 'Concluído').length;
+            const taxaConclusao = (consultasConcluidas / totalConsultas * 100) || 0;
+
+            return { totalConsultas, receitaTotal, idadeMedia, taxaConclusao };
+        }
+
+        // ========================================
+        // FUNÇÃO: ATUALIZAR CARDS DE MÉTRICAS
+        // ========================================
+        function atualizarCards(metricas) {
+            document.getElementById('totalConsultas').textContent = metricas.totalConsultas;
+            document.getElementById('receitaTotal').textContent = 'R$ ' + metricas.receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('idadeMedia').textContent = Math.round(metricas.idadeMedia) + ' anos';
+            document.getElementById('taxaConclusao').textContent = metricas.taxaConclusao.toFixed(1) + '%';
+        }
+
+        // ========================================
+        // FUNÇÃO: PREPARAR DADOS PARA GRÁFICOS
+        // ========================================
+        function prepararDadosReceita(dados) {
+            const agrupado = {};
+            dados.forEach(item => {
+                if (!agrupado[item.data]) {
+                    agrupado[item.data] = 0;
+                }
+                agrupado[item.data] += item.valor;
+            });
+
+            const meses = Object.keys(agrupado).sort();
+            const receitas = meses.map(mes => agrupado[mes]);
+
+            return { meses, receitas };
+        }
+
+        function prepararDadosEspecialidades(dados) {
+            const agrupado = {};
+            dados.forEach(item => {
+                if (!agrupado[item.especialidade]) {
+                    agrupado[item.especialidade] = 0;
+                }
+                agrupado[item.especialidade] += 1;
+            });
+
+            const especialidades = Object.keys(agrupado);
+            const quantidades = especialidades.map(esp => agrupado[esp]);
+
+            return { especialidades, quantidades };
+        }
+
+        function prepararDadosIdade(dados) {
+            const faixas = {
+                '18-30': 0,
+                '31-45': 0,
+                '46-60': 0,
+                '60+': 0
+            };
+
+            dados.forEach(item => {
+                if (item.idade <= 30) faixas['18-30']++;
+                else if (item.idade <= 45) faixas['31-45']++;
+                else if (item.idade <= 60) faixas['46-60']++;
+                else faixas['60+']++;
+            });
+
+            return {
+                labels: Object.keys(faixas),
+                valores: Object.values(faixas)
+            };
+        }
+
+        // ========================================
+        // FUNÇÃO: CRIAR/ATUALIZAR GRÁFICOS
+        // ========================================
+        function criarGraficos(dados) {
+            // Dados para os gráficos
+            const dadosReceita = prepararDadosReceita(dados);
+            const dadosEsp = prepararDadosEspecialidades(dados);
+            const dadosIdade = prepararDadosIdade(dados);
+
+            // Destruir gráficos anteriores se existirem
+            if (graficoReceita) graficoReceita.destroy();
+            if (graficoEspecialidades) graficoEspecialidades.destroy();
+            if (graficoIdade) graficoIdade.destroy();
+
+            // Gráfico de Receita Mensal (Linha)
+            const ctxReceita = document.getElementById('graficoReceita').getContext('2d');
+            graficoReceita = new Chart(ctxReceita, {
+                type: 'line',
+                data: {
+                    labels: dadosReceita.meses,
+                    datasets: [{
+                        label: 'Receita (R$)',
+                        data: dadosReceita.receitas,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            // Gráfico de Especialidades (Barras)
+            const ctxEsp = document.getElementById('graficoEspecialidades').getContext('2d');
+            graficoEspecialidades = new Chart(ctxEsp, {
+                type: 'bar',
+                data: {
+                    labels: dadosEsp.especialidades,
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: dadosEsp.quantidades,
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            // Gráfico de Distribuição de Idade (Pizza)
+            const ctxIdade = document.getElementById('graficoIdade').getContext('2d');
+            graficoIdade = new Chart(ctxIdade, {
+                type: 'doughnut',
+                data: {
+                    labels: dadosIdade.labels,
+                    datasets: [{
+                        data: dadosIdade.valores,
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // FUNÇÃO: POPULAR FILTROS
+        // ========================================
+        function popularFiltros() {
+            // Extrair especialidades únicas
+            const especialidades = ['Todas', ...new Set(dadosOriginais.map(item => item.especialidade))];
+            const selectEsp = document.getElementById('filtroEspecialidade');
+            selectEsp.innerHTML = '';
+            especialidades.forEach(esp => {
+                const option = document.createElement('option');
+                option.value = esp;
+                option.textContent = esp;
+                selectEsp.appendChild(option);
+            });
+
+            // Extrair períodos únicos
+            const periodos = ['Todos', ...new Set(dadosOriginais.map(item => item.data))].sort();
+            const selectPer = document.getElementById('filtroPeriodo');
+            selectPer.innerHTML = '';
+            periodos.forEach(per => {
+                const option = document.createElement('option');
+                option.value = per;
+                option.textContent = per;
+                selectPer.appendChild(option);
+            });
+        }
+
+        // ========================================
+        // FUNÇÃO PRINCIPAL: ATUALIZAR DASHBOARD
+        // ========================================
+        function atualizarDashboard() {
+            const dadosFiltrados = filtrarDados();
+            const metricas = calcularMetricas(dadosFiltrados);
+            
+            atualizarCards(metricas);
+            criarGraficos(dadosFiltrados);
+            popularFiltros();
+        }
+
+        // ========================================
+        // EVENTOS DOS FILTROS
+        // ========================================
+        document.getElementById('filtroEspecialidade').addEventListener('change', atualizarDashboard);
+        document.getElementById('filtroPeriodo').addEventListener('change', atualizarDashboard);
+
+        // ========================================
+        // INICIALIZAR DASHBOARD AO CARREGAR PÁGINA
+        // ========================================
+        window.addEventListener('load', function() {
+            atualizarDashboard();
+        });
+    </script>
+
+</body>
+</html>
